@@ -2,4 +2,4 @@
 
 ----------
 
-Chops and Banks Normal Logs outside of the Grand Exchange
+Chops and banks normal logs at the Grand Exchange for Profit.

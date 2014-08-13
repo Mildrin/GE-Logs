@@ -54,7 +54,7 @@ import org.powerbot.script.rt6.Interactive;
 import org.powerbot.script.rt6.MobileIdNameQuery;
 import org.powerbot.script.rt6.Skills;
 
-@Manifest(name = "GE Logs", description = "Chops and banks normal logs at the Grand Exchange.")
+@Manifest(name = "GE-Logs", description = "Chops and banks normal logs at the Grand Exchange for Profit.")
 public class GELogs extends PollingScript< ClientContext > implements PaintListener , MouseListener , MouseMotionListener
 {
 	public static final Random r = new Random();

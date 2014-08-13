@@ -7,24 +7,26 @@ import org.powerbot.script.rt6.ClientContext;
 public class MoveToTrees extends Task
 {
 	
-	public MoveToTrees( ClientContext ctx )
+	private GELogs main;
+	
+	public MoveToTrees( ClientContext ctx , GELogs main )
 	{
 		super(ctx);
+		this.main = main;
 	}
 	
 	@Override
 	public boolean activate()
 	{
-		return ctx.backpack.select().count() < 28 && ctx.players.local().animation() == -1
-				&& ctx.objects.select().id(GELogs.tree_ids).within(20).select(GELogs.getReachableFilter()).isEmpty();
+		return !main.isInvFull() && main.isPlayerIdle() && ctx.objects.select().id(GELogs.tree_ids).within(20).select(main.getReachableFilter()).isEmpty();
 	}
 	
 	@Override
 	public void execute()
 	{
-		GELogs.setStatus("Travelling to Trees");
+		main.setStatus("Travelling to Trees");
 		
-		ctx.movement.findPath(GELogs.getRandTreeLoc()).traverse();
+		ctx.movement.findPath(main.getRandTreeLoc()).traverse();
 	}
 	
 }

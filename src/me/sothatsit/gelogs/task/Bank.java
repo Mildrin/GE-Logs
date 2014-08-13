@@ -11,26 +11,26 @@ import org.powerbot.script.rt6.Item;
 public class Bank extends Task
 {
 	
-	public Bank( ClientContext ctx )
+	private GELogs main;
+	
+	public Bank( ClientContext ctx , GELogs main )
 	{
 		super(ctx);
+		this.main = main;
 	}
 	
 	@Override
 	public boolean activate()
 	{
-		return ctx.backpack.select().count() >= 28 &&
-				!ctx.objects.select().id(GELogs.banker_ids).isEmpty() &&
-				ctx.objects.nearest().poll().inViewport() &&
-				ctx.players.local().animation() == -1;
+		return !main.getBanks().isEmpty();
 	}
 	
 	@Override
 	public void execute()
 	{
-		GELogs.setStatus("Banking Inventory");
+		main.setStatus("Banking Inventory");
 		
-		GameObject bank = ctx.objects.poll();
+		GameObject bank = main.getBank();
 		
 		ctx.camera.turnTo(bank);
 		
@@ -38,9 +38,22 @@ public class Bank extends Task
 		
 		ctx.bank.open();
 		
-		if ( GELogs.getStartLogs() < 0 )
+		int timeout = 10;
+		
+		while (!ctx.bank.opened() && timeout > 0)
 		{
-			Iterator< Item > items = ctx.bank.select().id(GELogs.tree_item_id).iterator();
+			GELogs.sleep(500 , 750);
+			timeout--;
+		}
+		
+		if ( timeout <= 0 )
+			return;
+		
+		ctx.bank.select().id(GELogs.log_id);
+		
+		if ( main.getStartLogs() < 0 )
+		{
+			Iterator< Item > items = ctx.bank.iterator();
 			
 			int logs = 0;
 			
@@ -50,12 +63,12 @@ public class Bank extends Task
 				logs += i.stackSize();
 			}
 			
-			GELogs.setStartLogs(logs);
+			main.setStartLogs(logs);
 		}
 		
 		ctx.bank.depositInventory();
 		
-		Iterator< Item > items = ctx.bank.select().id(GELogs.tree_item_id).iterator();
+		Iterator< Item > items = ctx.bank.iterator();
 		
 		int logs = 0;
 		
@@ -65,8 +78,10 @@ public class Bank extends Task
 			logs += i.stackSize();
 		}
 		
-		GELogs.setLogs(logs);
+		main.setLogs(logs);
 		
 		ctx.bank.close();
+		
+		main.getStateMachine().setCurrentState("Chop");
 	}
 }

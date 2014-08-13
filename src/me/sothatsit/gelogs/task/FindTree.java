@@ -4,28 +4,31 @@ import me.sothatsit.gelogs.GELogs;
 
 import org.powerbot.script.rt6.ClientContext;
 import org.powerbot.script.rt6.GameObject;
+import org.powerbot.script.rt6.MobileIdNameQuery;
 
 public class FindTree extends Task
 {
 	
-	public FindTree( ClientContext ctx )
+	private GELogs main;
+	
+	public FindTree( ClientContext ctx , GELogs main )
 	{
 		super(ctx);
+		this.main = main;
 	}
 	
 	@Override
 	public boolean activate()
 	{
-		return ctx.backpack.select().count() < 28 && !ctx.objects.select().id(GELogs.tree_ids).select(GELogs.getReachableFilter()).isEmpty()
-				&& ctx.players.local().animation() == -1;
+		return !main.isInvFull() && !select().isEmpty() && main.isPlayerIdle() && ( main.getCurrentTree() == null || !main.getCurrentTree().inViewport() );
 	}
 	
 	@Override
 	public void execute()
 	{
-		GELogs.setStatus("Looking For Tree");
+		main.setStatus("Looking For Tree");
 		
-		GameObject tree = ctx.objects.nearest().poll();
+		GameObject tree = getTree();
 		
 		if ( !tree.inViewport() )
 		{
@@ -34,7 +37,17 @@ public class FindTree extends Task
 		}
 		
 		if ( tree.inViewport() )
-			GELogs.setCurrentTree(tree);
+			main.setCurrentTree(tree);
+	}
+	
+	public GameObject getTree()
+	{
+		return ctx.objects.nearest().limit(3).shuffle().poll();
+	}
+	
+	public MobileIdNameQuery< GameObject > select()
+	{
+		return ctx.objects.select().id(GELogs.tree_ids).select(main.getReachableFilter());
 	}
 	
 }

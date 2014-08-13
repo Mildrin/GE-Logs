@@ -8,26 +8,29 @@ import org.powerbot.script.rt6.GameObject;
 public class ChopTree extends Task
 {
 	
-	public ChopTree( ClientContext ctx )
+	private GELogs main;
+	
+	public ChopTree( ClientContext ctx , GELogs main )
 	{
 		super(ctx);
+		this.main = main;
 	}
 	
 	@Override
 	public boolean activate()
 	{
-		return ctx.backpack.select().count() < 28 && GELogs.getCurrentTree() != null && GELogs.getCurrentTree().inViewport();
+		return !main.isInvFull() && main.getCurrentTree() != null && main.getCurrentTree().inViewport();
 	}
 	
 	@Override
 	public void execute()
 	{
-		GameObject tree = GELogs.getCurrentTree();
+		GameObject tree = main.getCurrentTree();
 		
-		int timeout = 50;
+		int timeout = 30;
 		while (ctx.players.local().animation() == -1 && timeout > 0)
 		{
-			GELogs.setStatus("Interacting Tree " + ( GELogs.DEBUG ? (int) Math.ceil(timeout / 5) : "" ));
+			main.setStatus("Interacting Tree");
 			
 			if ( timeout % 5 == 0 )
 				tree.interact("Chop");
@@ -39,13 +42,13 @@ public class ChopTree extends Task
 		timeout = 50;
 		while (ctx.players.local().animation() != -1 && timeout > 0)
 		{
-			GELogs.setStatus("Chopping Tree " + ( GELogs.DEBUG ? (int) Math.ceil(timeout / 5) : "" ));
+			main.setStatus("Chopping Tree");
 			
 			GELogs.sleep(200 , 300);
 			timeout--;
 		}
 		
-		GELogs.setCurrentTree(null);
+		main.setCurrentTree(null);
 	}
 	
 }
